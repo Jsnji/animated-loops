@@ -1,0 +1,56 @@
+<!-- Canvas for animation -->
+<canvas id="animationCanvas" width="640" height="360" style="border:1px solid #ccc;"></canvas>
+
+<!-- Audio element autoplay muted (required for autoplay in browsers) -->
+<audio id="bgMusic" src="https://static.wixstatic.com/mp3/ac0f6e_229b05b4f04e4a7391f5e83958805c07.m4a" loop autoplay muted></audio>
+
+<!-- Optional play button to unmute -->
+<button id="playBtn" style="margin-top: 10px;">Unmute & Play Audio</button>
+
+<script>
+  const canvas = document.getElementById('animationCanvas');
+  const ctx = canvas.getContext('2d');
+  const audio = document.getElementById('bgMusic');
+  const playBtn = document.getElementById('playBtn');
+
+  const totalFrames = 757;
+  const fps = 49.4971;
+  const frameDuration = 1000 / fps; // ≈ 20.202 ms per frame
+  let currentFrame = 1;
+  const images = [];
+
+  // Preload images with 5-digit zero padding (e.g., frame00001.png)
+  for (let i = 1; i <= totalFrames; i++) {
+    const img = new Image();
+    img.src = `frames/frame${String(i).padStart(5, '0')}.png`;
+    images.push(img);
+  }
+
+  function drawFrame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (images[currentFrame - 1].complete) {
+      ctx.drawImage(images[currentFrame - 1], 0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  function animate() {
+    drawFrame();
+    currentFrame++;
+    if (currentFrame > totalFrames) currentFrame = 1;
+    setTimeout(animate, frameDuration);
+  }
+
+  window.onload = () => {
+    animate();
+    audio.play().catch(() => {
+      console.log('Autoplay blocked, user interaction required.');
+    });
+  };
+
+  // Unmute & resume audio on button click
+  playBtn.addEventListener('click', () => {
+    audio.muted = false;
+    audio.play();
+    playBtn.style.display = 'none';
+  });
+</script>
